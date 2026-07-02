@@ -1,4 +1,4 @@
-# Six Hats — AI Startup-Idea Analyzer (Backend)
+# Six Hats — AI Startup-Idea Analyzer
 
 A multi-agent **FastAPI backend** that evaluates **startup ideas** through Edward de Bono's
 **Six Thinking Hats**, built on [LangChain DeepAgents](https://docs.langchain.com/oss/python/deepagents/overview)
