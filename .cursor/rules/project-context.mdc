@@ -1,0 +1,93 @@
+---
+description: Core project context for the Six Thinking Hats startup-idea analyzer (DeepAgents)
+alwaysApply: true
+---
+
+# Project: "Six Hats" — AI Startup-Idea Analyzer
+
+A multi-agent app that evaluates **startup ideas** using Edward de Bono's
+**Six Thinking Hats**. Built on **LangChain DeepAgents** (Python).
+
+**Ecosystem: Google Gemini only.** Use `langchain-google-genai` and model
+strings like `google_genai:gemini-2.0-flash` (current default; chosen for its
+larger free-tier daily quota ~200/day vs 20/day for 2.5 models). Do NOT use the Anthropic
+ecosystem. API key env var: `GOOGLE_API_KEY`. (Note: DeepAgents prompt caching
+is Anthropic/Bedrock-only, so it won't apply here.)
+
+## Product
+- Input: a startup idea / decision from the user.
+- Output: a structured, balanced analysis + a final recommendation with next steps.
+- Domain is locked to **startup ideas** (market, product, risk, viability).
+
+## Architecture
+- **Blue Hat = orchestrator** (the main DeepAgent). Plans, fans out to the five
+  hat subagents in parallel, then synthesizes the final recommendation.
+- **Five hat subagents** (DeepAgents `subagents=`, run in isolated context):
+  - **White** — facts. Has a **real web search tool** (market size, competitors, trends).
+  - **Yellow** — benefits / upside.
+  - **Black** — risks, weaknesses, failure modes.
+  - **Green** — creative alternatives, pivots, new angles.
+  - **Red** — gut feeling / intuition (no justification required).
+- Each hat = a custom subagent with its own `system_prompt` (one per hat).
+
+## "Real tools per hat" (key differentiator)
+- White Hat uses **web search** first (placeholder until a data API is added).
+- Other hats reason over White Hat's gathered facts + the idea.
+
+## DeepAgents primitives to use
+- `create_deep_agent(model="google_genai:gemini-2.5-flash", ...)` for Blue.
+- `subagents=` to define the five hats (isolated context, single handoff back).
+  Each subagent dict = `name`, `description`, `system_prompt`, optional `tools`/`model`.
+- Built-in `write_todos` for planning; virtual filesystem for sharing findings.
+- Tools/MCP passed via `tools=`; per-hat `model` override allowed (all Gemini).
+
+## Terminology note
+DeepAgents has its OWN `SKILL.md` and `AGENTS.md` (memory) — those are app
+runtime concepts, distinct from this Cursor rule.
+
+## Delivery
+- This is a **FastAPI backend** (`src/six_hats/api.py`) exposing an API for
+  frontends: `POST /analyze {idea}` -> `{idea, report}`, `GET /health`, and
+  `POST /analyze/stream` (SSE live per-hat progress via `agent.stream_events`
+  + `.interleave("messages","subagents")`, `version="v3"`).
+- Sync agent runs offloaded via `run_in_threadpool`. CORS open in dev; lock via
+  `SIX_HATS_CORS_ORIGINS` in prod.
+- Run: `uvicorn six_hats.api:app --reload --app-dir src`.
+
+## Dependencies (pinned, verified compatible — langchain-core 1.4.8)
+- `deepagents==0.6.12` (bundles langchain-google-genai>=4.2.5, langchain-anthropic)
+- `langchain-google-genai==4.2.6`, `tavily-python`, `fastapi`, `uvicorn[standard]`
+- NOTE: pin top-level versions; flaky networks make pip backtrack-downgrade
+  deepagents on a download timeout. Install with `--timeout 120 --retries 10`.
+
+## Layout
+- `src/six_hats/prompts.py` — Blue + 5 hat prompts
+- `src/six_hats/tools.py` — `internet_search` (Tavily), White Hat only
+- `src/six_hats/agent.py` — `build_agent()`, `analyze_idea()`
+- `src/six_hats/api.py` — FastAPI app
+
+## Known issues / fixes (Gemini)
+- `MALFORMED_FUNCTION_CALL`: Gemini emits invalid tool-call JSON on complex
+  schemas (e.g. write_todos). FIX = `src/six_hats/middleware.py`
+  (`fix_malformed_gemini`) retries with a JSON-escape nudge. Wired via
+  `create_deep_agent(middleware=[...])`. Verified working.
+- Rate limits: free tier 2.5-series models = ~5-15 req/min AND only **~20 req/DAY
+  per model**. One Six Hats run uses ~10-20 calls, so free tier sustains ≈1 run/
+  day/model. `agent.py` uses a shared `InMemoryRateLimiter` (SIX_HATS_RPM) +
+  max_retries. Per-DAY cap is an ACCOUNT limit — real fix is enabling billing.
+- 503 UNAVAILABLE (high demand): transient; `middleware.fix_gemini_errors` retries
+  with backoff and is attached to BOTH Blue and every subagent (custom middleware
+  does NOT auto-propagate to subagents, so each subagent sets it explicitly).
+- Observed on THIS project: gemini-2.5-flash & -flash-lite = 20 req/day free (both
+  exhausted during testing); gemini-2.0-flash = **limit 0** free (no free tier).
+  CONCLUSION: free tier cannot run this multi-agent app. ENABLING BILLING is the
+  only real fix. Code is complete & correct — it runs as soon as quota exists.
+  Billing setup: https://aistudio.google.com/ (Settings > Billing) or the linked
+  Cloud project. After billing, current code works unchanged.
+
+## Status
+- Stack: Python + DeepAgents + **Gemini** + **FastAPI**. Verified end-to-end up to
+  live calls: auth OK, malformed-call fix works (Blue delegated to hats), per-minute
+  throttle works. BLOCKED only by free-tier DAILY quota (20/day) being exhausted.
+- Code is complete & correct; remaining issue is purely Gemini account quota.
+- Next: enable billing OR switch model for fresh quota; then auth, persistence.

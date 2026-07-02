@@ -1,0 +1,8 @@
+# Pinned to a mutually-compatible set (langchain-core 1.4.8 satisfies all).
+# Pinning also prevents pip from downgrading deepagents on transient network timeouts.
+deepagents==0.6.12
+langchain-google-genai==4.2.6
+tavily-python==0.7.26
+python-dotenv==1.2.2
+fastapi==0.138.1
+uvicorn[standard]==0.49.0

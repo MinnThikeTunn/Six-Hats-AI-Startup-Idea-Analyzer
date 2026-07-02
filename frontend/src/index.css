@@ -1,0 +1,154 @@
+@import 'tailwindcss';
+
+@theme {
+  /* SF Pro on Apple platforms; Inter is the closest open-source substitute. */
+  --font-sans: 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  --font-display: 'SF Pro Display', system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Apple surface system (light-dominant) */
+  --color-canvas: #ffffff;
+  --color-parchment: #f5f5f7;
+  --color-pearl: #fafafc;
+  --color-tile: #272729;
+  --color-tile-2: #2a2a2c;
+
+  /* Ink / text */
+  --color-ink: #1d1d1f;
+  --color-ink-80: #333333;
+  --color-ink-48: #7a7a7a;
+
+  /* Hairlines */
+  --color-hairline: #e0e0e0;
+  --color-divider: #f0f0f0;
+
+  /* The single blue accent — every interactive element. */
+  --color-action: #0066cc;
+  --color-action-focus: #0071e3;
+  --color-action-dark: #2997ff;
+
+  /* Per-hat persona colors (the "products" on display) */
+  --color-hat-white: #aeb4c2;
+  --color-hat-red: #f4516c;
+  --color-hat-black: #6b7384;
+  --color-hat-yellow: #f5b53d;
+  --color-hat-green: #34d399;
+  --color-hat-blue: #0066cc;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.01em;
+    background-color: var(--color-parchment);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  /* The one signature drop-shadow, reserved for product (persona) imagery. */
+  .shadow-product {
+    box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+  }
+  /* Frosted bars (sub-nav, sticky composer). */
+  .frosted {
+    background-color: rgba(245, 245, 247, 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+  /* Floating liquid-glass capsule (Apple-style). */
+  .glass {
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(200%) blur(60px);
+    -webkit-backdrop-filter: saturate(200%) blur(60px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 12px 34px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .scrollbar-slim {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-hairline) transparent;
+  }
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: var(--color-hairline);
+    border-radius: 9999px;
+  }
+  .scrollbar-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ---- Animations ---- */
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-rise {
+  animation: fade-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--ring-color, rgba(0, 102, 204, 0.45));
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1.8s cubic-bezier(0.66, 0, 0, 1) infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.caret-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+.typing-dot {
+  animation: dot-bounce 1.2s infinite ease-in-out;
+}
