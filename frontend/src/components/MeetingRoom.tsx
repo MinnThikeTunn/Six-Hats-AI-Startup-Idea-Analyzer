@@ -38,17 +38,24 @@ export function MeetingRoom({ messages, activeSpeaker, hatStatus, phase, report,
   return (
     <div className="mx-auto grid h-full min-h-0 w-full max-w-6xl grid-rows-[auto_minmax(0,1fr)] gap-0 lg:grid-cols-[300px_minmax(0,1fr)] lg:grid-rows-1 lg:gap-5 lg:px-6 lg:py-5">
       {/* Roster */}
-      <aside className="min-w-0 px-4 pt-4 lg:px-0 lg:pt-0">
-        <div className="lg:sticky lg:top-0">
+      <aside className="min-w-0 px-4 pt-4 lg:min-h-0 lg:overflow-hidden lg:px-0 lg:pt-0">
+        <div className="flex h-full flex-col">
           <h2 className="mb-3 hidden text-[12px] font-semibold uppercase tracking-[0.18em] text-ink-48 lg:block">
             Around the Table
           </h2>
-          <div className="flex gap-2.5 overflow-x-auto pb-2 lg:grid lg:grid-cols-1 lg:gap-2.5 lg:overflow-visible lg:pb-0 scrollbar-slim">
-            {HAT_ORDER.map((key) => (
-              <div key={key} className="w-60 shrink-0 lg:w-auto">
-                <ParticipantCard persona={HATS[key]} status={hatStatus[key]} active={activeSpeaker === key} />
-              </div>
-            ))}
+          <div className="relative min-h-0 flex-1">
+            <div className="flex gap-2.5 overflow-x-auto pb-2 lg:max-h-full lg:flex-col lg:gap-2.5 lg:overflow-y-auto lg:pb-2 lg:pr-2 scrollbar-slim">
+              {HAT_ORDER.map((key) => (
+                <div key={key} className="min-w-[200px] w-[200px] shrink-0 md:min-w-[220px] md:w-[220px] lg:w-full lg:min-w-0">
+                  <ParticipantCard persona={HATS[key]} status={hatStatus[key]} active={activeSpeaker === key} />
+                </div>
+              ))}
+            </div>
+            {/* Scroll indicators for smaller screens (horizontal) */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-parchment to-transparent lg:hidden" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-parchment to-transparent lg:hidden" />
+            {/* Scroll indicator for desktop (vertical bottom fade) */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-8 bg-gradient-to-t from-parchment to-transparent lg:block" />
           </div>
         </div>
       </aside>

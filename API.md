@@ -1,4 +1,4 @@
-# Six Hats API Reference
+#uvicorn six_hats.api:app --reload --app-dir src Six Hats API Reference
 
 HTTP API for the **Six Hats** startup-idea analyzer. POST a startup idea and a
 six-agent pipeline (Blue orchestrator + White / Yellow / Black / Green / Red hats,

@@ -17,7 +17,7 @@ interface Props {
 export function ParticipantCard({ persona, status, active }: Props) {
   return (
     <div
-      className="flex items-center gap-3 rounded-[18px] border bg-canvas p-3 transition-all duration-300"
+      className="flex items-center gap-2.5 rounded-[18px] border bg-canvas p-2.5 transition-all duration-300 md:gap-3 md:p-3"
       style={{
         background: active ? persona.tint : '#ffffff',
         borderColor: active ? persona.accent : '#e0e0e0',
@@ -26,10 +26,10 @@ export function ParticipantCard({ persona, status, active }: Props) {
       <HatAvatar persona={persona} size="md" active={active} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-[15px] font-semibold text-ink">{persona.name}</span>
+          <span className="truncate text-[14px] font-semibold text-ink md:text-[15px]">{persona.name}</span>
           <StatusPill status={status} accent={persona.accent} />
         </div>
-        <p className="truncate text-[13px] text-ink-48">{persona.role}</p>
+        <p className="truncate text-[12px] text-ink-48 md:text-[13px]">{persona.role}</p>
       </div>
     </div>
   )

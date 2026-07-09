@@ -13,6 +13,9 @@ import json
 import os
 
 from dotenv import load_dotenv
+# Load environment variables early and override any shell-defined variables
+load_dotenv(override=True)
+
 from fastapi import FastAPI, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,7 +24,6 @@ from pydantic import BaseModel, Field
 
 from .agent import _content_to_text, analyze_idea, build_agent
 
-load_dotenv()
 
 app = FastAPI(
     title="Six Hats API",
