@@ -5,9 +5,14 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 
+from dotenv import load_dotenv
+# Load environment variables early and override any shell-defined variables
+load_dotenv(override=True)
+
 from deepagents import create_deep_agent
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 from .middleware import fix_gemini_errors
 from .prompts import (
