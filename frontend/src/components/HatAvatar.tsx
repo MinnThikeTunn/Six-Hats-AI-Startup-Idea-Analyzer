@@ -2,7 +2,7 @@ import type { HatPersona } from '../lib/hats'
 
 type Size = 'sm' | 'md' | 'lg'
 
-const SIZE_PX: Record<Size, number> = { sm: 36, md: 44, lg: 56 }
+const SIZE_PX: Record<Size, number> = { sm: 32, md: 40, lg: 56 }
 
 function TopHatGlyph({ color }: { color: string }) {
   return (
